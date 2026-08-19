@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.0.4
+
+- **`task` reuses the L2 recipes.** The inline subagent definitions are gone;
+  `task` maps `general-purpose`/`explore`/`plan` onto `lib/subagents.js`
+  (upstream grok-build `subagent_prompt.md` + `task.rs` prompts).
+- **`explore`/`plan` match upstream read-only tool sets.** `explore` =
+  `read_file`/`list_dir`/`grep`; `plan` adds `web_search`/`todo_write`.
+
 ## 1.0.3
 
 - **Upstream system prompt.** `lib/system-prompt.js` carries the Grok Build
