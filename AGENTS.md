@@ -148,7 +148,9 @@ keeps the plugin resilient when the preset and the runtime disagree.
   because the continuable route never calls `provider.start()`. The tool declares
   `isConcurrencySafe: () => true` and registers a `systemPrompt` section (`tool:task`,
   order `116.5`) that teaches the background-first convention while the tool is visible.
-  Provider preference is `grok-agent` / `grok-explore` when listed, then `spawn`.
+  `subagent_type` maps onto the recipes in `lib/subagents.js` (`general-purpose` →
+  `grok-agent`, `explore` → `grok-explore`, `plan` → `grok-plan`); provider preference is
+  the recipe name when listed, then `grok-agent`, then `spawn`.
 - **`enter_plan_mode` / `exit_plan_mode`** use the `planMode` service
   (`planMode.set(agent, true/false)`) and are only registered when `planMode` is present.
 
