@@ -12,6 +12,17 @@ DSH 有个很朴素的想法：**一切都是插件**。模型是插件，工具
 
 `web_search` 用 Grok OAuth JWT 打 `cli-chat-proxy.grok.com`（`tools: [{type:'web_search'}]`），不走 DeepSeek 搜索。`web_fetch` 是经同一代理的本地 HTTPS GET。对齐 grok-build `e5fd481`（2026-08-13）；之后 origin/main 只动 workspace/权限/媒体内部，没有新的 grok_build 工具名。
 
+## 系统提示词与子代理
+
+`lib/system-prompt.js` 携带上游 **Grok Build** 的 `prompt.md`（按 DSH 工具面解析）；
+`apply()` 把它注册为 agent 唯一的 system-prompt 段（`complete: true` +
+`suppressRuntimeContext()`）。
+
+`lib/subagents.js` 提供该内核自己的子代理配方——`grok-agent`（general-purpose）、
+`grok-explore`、`grok-plan`——每个都是上游 `subagent_prompt.md` 注入内置角色
+prompt 后的结果。mesh 会加载它们，并在每个子代理上以 `config.tools` 白名单挂载
+本插件，所以 grok 子代理看到和使用的正是 grok 子代理的工具。
+
 ## 安装
 
 把本目录复制到你的 profile，然后在 grok-kernel 预设的 **planning** 分组里加一行：

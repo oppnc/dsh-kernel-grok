@@ -36,6 +36,7 @@ function createHarness() {
   const files = new Map()
   const registered = new Map()
   const sections = []
+  let suppressed = false
   const calls = {
     startContinuable: [],
     start: [],
@@ -221,13 +222,14 @@ function createHarness() {
       resolve() { return { mode: 'danger-full-access', workspaceRoot } },
     },
     userQuestions: { async ask() { return { answers: [] } } },
-    systemPrompt: { section(s) { sections.push(s) } },
+    systemPrompt: { section(s) { sections.push(s) }, suppressRuntimeContext() { suppressed = true } },
   }
 
   return {
     ctx: { get(name) { return services[name] } },
     registered,
     sections,
+    get suppressed() { return suppressed },
     calls,
     files,
     workspaceRoot,
@@ -311,10 +313,15 @@ async function main() {
   match(fg, /Partial output before the run ended:/, 'foreground max-tokens includes partial-output wording')
   match(fg, /grok partial answer/, 'foreground includes partial child text')
 
-  eq(h.sections.length, 1, 'systemPrompt.section registered once')
-  eq(h.sections[0].name, 'tool:task', 'systemPrompt section name')
-  eq(h.sections[0].order, 116.5, 'systemPrompt section order')
-  ok(typeof h.sections[0].text === 'function', 'systemPrompt section text is a function')
+  eq(h.sections.length, 2, 'systemPrompt registers persona + tool section')
+  eq(h.sections[0].name, 'deployment:persona', 'persona section name')
+  eq(h.sections[0].order, 0, 'persona section order')
+  eq(h.sections[0].complete, true, 'persona section is complete')
+  ok(typeof h.sections[0].text === 'string', 'persona text is a string')
+  eq(h.sections[1].name, 'tool:task', 'tool section name')
+  eq(h.sections[1].order, 116.5, 'tool section order')
+  ok(typeof h.sections[1].text === 'function', 'tool section text is a function')
+  ok(h.suppressed, 'runtime context suppressed')
 
   const search_replace = h.registered.get('search_replace')
   const created = await search_replace.execute({
