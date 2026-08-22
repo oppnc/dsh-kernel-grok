@@ -26,14 +26,22 @@ subagent sees and uses exactly grok's subagent tools.
 
 ## Install
 
-Copy this directory into your profile, then add a row inside the **planning** group of the grok-kernel preset:
+1. Install the plugin into your profile with the official plugin command:
 
-```yaml
-- id: grok-surface
-  name: dsh-kernel-grok
-```
+   ```sh
+   dsh plugin --profile web add github:oppnc/dsh-kernel-grok
+   ```
 
-The grok-kernel preset already disables DSH's colliding rows for you (`tool-fs-search`, `tool-web`, `tool-todo`, `tool-ask-user`).
+   This package is a plain plugin (no `dsh.bundle` declaration), so `dsh plugin` installs it as an inactive dependency — that is expected: the preset row below references it by name.
+
+2. Install the `grok-kernel` agent preset: copy its directory into `~/.dsh/.agent-presets/grok-kernel/`. The shipped preset already includes the `grok-surface` row inside the **planning** group; if you author your own preset, add it there:
+
+   ```yaml
+   - id: grok-surface
+     name: dsh-kernel-grok
+   ```
+
+   The grok-kernel preset also disables DSH's colliding rows for you (`tool-fs-search`, `tool-web`, `tool-todo`, `tool-ask-user`).
 
 ## Usage
 

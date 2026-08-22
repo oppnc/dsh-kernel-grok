@@ -25,14 +25,22 @@ prompt 后的结果。mesh 会加载它们，并在每个子代理上以 `config
 
 ## 安装
 
-把本目录复制到你的 profile，然后在 grok-kernel 预设的 **planning** 分组里加一行：
+1. 用官方插件命令把本包装进你的 profile：
 
-```yaml
-- id: grok-surface
-  name: dsh-kernel-grok
-```
+   ```sh
+   dsh plugin --profile web add github:oppnc/dsh-kernel-grok
+   ```
 
-grok-kernel 预设已经替你禁用了 DSH 里重名的行（`tool-fs-search`、`tool-web`、`tool-todo`、`tool-ask-user`）。
+   本包是普通插件（没有 `dsh.bundle` 声明），`dsh plugin` 会把它作为不激活的依赖安装——这是预期行为：下面的预设行会按名字引用它。
+
+2. 安装 `grok-kernel` agent 预设：把它的目录复制到 `~/.dsh/.agent-presets/grok-kernel/`。随附的预设已经在 **planning** 分组里包含 `grok-surface` 行；如果你自己写预设，就把它加进该分组：
+
+   ```yaml
+   - id: grok-surface
+     name: dsh-kernel-grok
+   ```
+
+   grok-kernel 预设也会替你禁用 DSH 里重名的行（`tool-fs-search`、`tool-web`、`tool-todo`、`tool-ask-user`）。
 
 ## 使用
 

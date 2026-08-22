@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased
+
+- **`GROK_HOME` honored** when locating `auth.json` (grok-build's own override).
+- **Proxy defaults to direct.** `web_search`/`web_fetch` now honor
+  `HTTPS_PROXY`/`https_proxy`/`HTTP_PROXY`/`http_proxy` and fall back to a direct
+  connection instead of a hardcoded local proxy port.
+
 ## 0.1.4
 
 - **`task` reuses the L2 recipes.** The inline subagent definitions are gone;
