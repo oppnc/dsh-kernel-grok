@@ -29,6 +29,18 @@ without — `fs`, `tools`, `subprocess`, `web`, `jobs` — belong there. Optiona
 nothing. Every registration (`tools.register`, `systemPrompt.section`) is fiber-scoped
 inside `apply()`; there are no module-level side effects.
 
+### Mesh dependency and fallback mount
+
+`dsh-kernel-mesh` is a declared dependency (`github:oppnc/dsh-kernel-mesh#semver:^0.1.6`),
+so installing this package also installs the mesh. The mesh is still expected to be mounted
+ONCE by the host composition (profile bundle) and shared by all vendor packages. As a
+safety net, `apply()` first runs `ensureKernelMesh(ctx, ...)` (`lib/ensure-mesh.js`): if
+the mesh's `kernelMesh` marker service is absent AND no `*-kernel` route is registered,
+the plugin mounts its own copy of the mesh (bare specifier, with a dev-layout sibling
+fallback). A fallback-mounted mesh shares THIS row's lifecycle — its routes disappear
+when the row unloads — so the profile-level mount stays the preferred form and the
+fallback logs a pointer to `dsh plugin add dsh-kernel-mesh`.
+
 ## System prompt (persona)
 
 `lib/system-prompt.js` carries the upstream **Grok Build** system prompt, rewritten in DSH
@@ -65,6 +77,27 @@ Rust source under `crates/codegen/xai-grok-tools/src/implementations/`. The mapp
 | `ask_user_question`  | `AskUserQuestionInput` |
 | `task`               | `task/mod.rs` (`TaskToolInput` → `TaskTool`) |
 | `enter_plan_mode` / `exit_plan_mode` | plan-mode pair |
+
+**Re-checked against grok-build `e5fd481..origin/main` (2026-08 sync, 12 "Synced from
+monorepo" commits).** Findings: every existing tool's name/description/schema is unchanged
+(all in-range hunks are test-only assertion loosening); `prompt.md` and the subagent persona
+prompts are byte-identical. Actionable deltas applied:
+
+- `x-grok-client-version` bumped `1.0.3` → `1.0.12` (tracks
+  `crates/codegen/xai-grok-version/Cargo.toml`; also in the mesh's grok adapter).
+- Upstream removed `capability_mode` from the model-facing `task` schema
+  (`#[schemars(skip)]`); this plugin never advertised it.
+- Upstream added `send_subagent_message` (`subagent_id` + `text`, maps to DSH
+  `send_message`) but ships it **feature-gated and off by default** — not registered here;
+  `task.resume` already covers the follow-up channel.
+- Upstream's `workflow` tool input was restructured (`source` tagged enum); this plugin
+  does not expose a workflow tool.
+- Subagent wiring: upstream now strips `ask_user_question` (and the workflow tool) from
+  every subagent — mirrored in `lib/subagents.js` (the `grok-agent` allow-list omits
+  `ask_user_question`).
+- Model catalog: `grok-4.6` is the new default (500K context, `supports_backend_search`,
+  `system_prompt_label: "Grok 4.6"`) and advertises effort `xhigh` above `high`; the mesh
+  grok adapter passes `xhigh` through verbatim and collapses only `max` → `xhigh`.
 
 Two semantic load-bearing details come straight from grok and are preserved verbatim:
 
@@ -144,8 +177,11 @@ keeps the plugin resilient when the preset and the runtime disagree.
   channel `send_message` uses). Foreground (`run_in_background: false`) awaits
   `subagents.start` and, on a non-`completed` stop, appends
   `"Partial output before the run ended:"` plus the child's text — the native wording.
-  Every request sets `agentOptions` / `persona` / `toolFilter` / `maxDepth: 3` explicitly
-  because the continuable route never calls `provider.start()`. The tool declares
+  Every request sets `agentOptions` / `persona` / `maxDepth: 3` explicitly
+  because the continuable route never calls `provider.start()`. `toolFilter` is
+  deliberately NOT set: since dsh-tools 0.1.1-rc.2, `tools.restrict()` accepts only
+  GLOBAL tool names and rejects scope-local (vendor) names — the mesh `agent/created`
+  listener applies the child tool mask instead (mesh AGENTS.md §6). The tool declares
   `isConcurrencySafe: () => true` and registers a `systemPrompt` section (`tool:task`,
   order `116.5`) that teaches the background-first convention while the tool is visible.
   `subagent_type` maps onto the recipes in `lib/subagents.js` (`general-purpose` →

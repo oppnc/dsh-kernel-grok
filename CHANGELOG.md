@@ -1,5 +1,32 @@
 # Changelog
 
+## 0.1.6
+
+- **Mesh dependency + fallback mount.** `dsh-kernel-mesh` is now a declared
+  dependency (`github:oppnc/dsh-kernel-mesh#semver:^0.1.6`), so installing this
+  package also installs the mesh. At `apply()` time the plugin checks for the
+  mesh's `kernelMesh` marker service / any `*-kernel` route; when the host
+  composition never mounted the mesh, the plugin mounts its own copy
+  (`lib/ensure-mesh.js`) so kernel routes and subagent recipes keep working —
+  with a logged pointer to the preferred profile-level mount
+  (`dsh plugin add dsh-kernel-mesh`), since a fallback-mounted mesh shares this
+  row's lifecycle.
+
+## 0.1.5
+
+- **DSH 0.1.1-rc.2 compatibility: `task` no longer sets `toolFilter` on
+  subagent requests.** The new dsh-tools restricts `tools.restrict()` to GLOBAL
+  tool names and rejects scope-local (vendor) names; the child tool mask is
+  applied by the mesh `agent/created` listener instead (mesh AGENTS.md §6).
+  The smoke test now asserts the request carries no `toolFilter`.
+- **Grok Build sync (e5fd481..origin/main, 2026-08).** `x-grok-client-version`
+  bumped 1.0.3 → 1.0.12 (tracks `xai-grok-version/Cargo.toml`). Subagent
+  recipes mirror upstream wiring: `grok-agent` no longer whitelists
+  `ask_user_question` (upstream strips `ToolKind::AskUser` from every
+  subagent). Upstream's new `send_subagent_message` tool ships feature-gated
+  and off by default — not registered; `task.resume` covers the channel.
+  Existing tool schemas unchanged (all upstream hunks were test-only).
+
 ## Unreleased
 
 - **`GROK_HOME` honored** when locating `auth.json` (grok-build's own override).
