@@ -1,6 +1,6 @@
 {
   "name": "dsh-kernel-grok",
-  "version": "0.1.7",
+  "version": "0.1.8",
   "description": "Grok Build tool surface written in DSH form, distilled from xai-grok-tools.",
   "type": "module",
   "main": "lib/index.js",
@@ -48,6 +48,6 @@
     "url": "git+https://github.com/oppnc/dsh-kernel-grok.git"
   },
   "dependencies": {
-    "dsh-kernel-mesh": "github:oppnc/dsh-kernel-mesh#semver:^0.1.7"
+    "dsh-kernel-mesh": "^0.1.8"
   }
 }

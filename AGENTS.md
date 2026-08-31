@@ -31,7 +31,7 @@ inside `apply()`; there are no module-level side effects.
 
 ### Mesh dependency and fallback mount
 
-`dsh-kernel-mesh` is a declared dependency (`github:oppnc/dsh-kernel-mesh#semver:^0.1.7`),
+`dsh-kernel-mesh` is a declared dependency (`dsh-kernel-mesh@^0.1.8`),
 so installing this package also installs the mesh. The mesh is still expected to be mounted
 ONCE by the host composition (profile bundle) and shared by all vendor packages. As a
 safety net, `apply()` first runs `ensureKernelMesh(ctx, ...)` (`lib/ensure-mesh.js`): if
