@@ -1,6 +1,6 @@
 {
   "name": "dsh-kernel-grok",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "description": "Grok Build tool surface written in DSH form, distilled from xai-grok-tools.",
   "type": "module",
   "main": "lib/index.js",
@@ -33,16 +33,21 @@
   },
   "keywords": [
     "dsh",
+    "dsh-plugin",
     "deepseek-harness",
     "cordis",
     "grok",
     "grok-build"
   ],
+  "homepage": "https://github.com/oppnc/dsh-kernel-grok#readme",
+  "bugs": {
+    "url": "https://github.com/oppnc/dsh-kernel-grok/issues"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/oppnc/dsh-kernel-grok.git"
   },
   "dependencies": {
-    "dsh-kernel-mesh": "github:oppnc/dsh-kernel-mesh#semver:^0.1.6"
+    "dsh-kernel-mesh": "github:oppnc/dsh-kernel-mesh#semver:^0.1.7"
   }
 }
